@@ -1,0 +1,100 @@
+Albuquerque
+Santa Fe
+Roswell
+Taos
+Farmington
+Las Cruces
+Gallup
+Socorro
+Carlsbad
+Silver City
+Phoenix
+Tucson
+Mesa
+Scottsdale
+Flagstaff
+Sedona
+Tempe
+Glendale
+Yuma
+Prescott
+Denver
+Boulder
+Fort Collins
+Colorado Springs
+Aspen
+Vail
+Durango
+Grand Junction
+Telluride
+Greeley
+Dallas
+Austin
+Houston
+San Antonio
+El Paso
+Lubbock
+Amarillo
+Waco
+Plano
+Irving
+Los Angeles
+San Diego
+San Jose
+San Francisco
+Sacramento
+Fresno
+Bakersfield
+Santa Barbara
+Monterey
+Palm Springs
+Seattle
+Spokane
+Tacoma
+Olympia
+Everett
+Bellingham
+Yakima
+Kennewick
+Wenatchee
+Pullman
+Chicago
+Springfield
+Peoria
+Naperville
+Rockford
+Aurora
+Joliet
+Evanston
+Decatur
+Champaign
+Miami
+Orlando
+Tampa
+Jacksonville
+Tallahassee
+Pensacola
+Naples
+Fort Lauderdale
+Key West
+Sarasota
+New York
+Buffalo
+Rochester
+Albany
+Syracuse
+Ithaca
+Yonkers
+Utica
+White Plains
+Niagara Falls
+Boston
+Cambridge
+Salem
+Worcester
+Springfield
+Lowell
+Plymouth
+Quincy
+Newton
+Brookline
