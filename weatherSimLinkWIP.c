@@ -10,9 +10,9 @@
 #define MAX_CITIES 100
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 //                                Structures
-//-----------------------------------------------------------------------------
+//=============================================================================
 
 
 /*
@@ -52,9 +52,9 @@ typedef struct {
 } SensorList;
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 //                              City Importing
-//-----------------------------------------------------------------------------
+//=============================================================================
 
 
 /*
@@ -265,6 +265,17 @@ void freeList(SensorList *list) {
 }
 
 /*
+* clamp
+*
+* Small helper for use with updateSensors.
+*/
+int clamp(int value, int min, int max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
+/*
 * updateSensors
 *
 * This function creates a weighted roll for refreshing the current weather
@@ -372,10 +383,117 @@ void calculateDeltas(const SensorList *prevList, const SensorList *newList, Sens
     }
 }
 
+/*
+* weatherForecast
+*
+* Takes user selection of city and provides a detailed look
+* at the current conditions, latest changes, and ultimately
+* provides a rudimentary forecast based on combinations of both
+* current and changing conditions.
+*/
+void weatherForecast(SensorList *currentList, SensorList *delta, int sensor) {
+    Node *target = currentList->header->next;
 
-//-----------------------------------------------------------------------------
+    while (target != currentList->header) {
+        if (target->data.id == sensor) {
+            break;
+        }
+        target = target->next;
+    }
+
+    if (target == currentList->header) {
+        printf("Sensor %d not found in current list.\n", sensor);
+        return;
+    }
+
+    printf("\nForecast for %s\n", target->data.city);
+    printf("-----------------------------\n");
+
+    printf("Current temperature: %d F\n", target->data.temperature);
+    printf("Current humidity:    %d%%\n", target->data.humidity);
+    printf("Current pressure:    %d mb\n", target->data.pressure);
+    printf("Current wind speed:  %d mph\n", target->data.wind);
+
+    Node *tarDelta = delta->header->next;
+
+    while (tarDelta != delta->header) {
+        if (tarDelta->data.id == sensor) {
+            break;
+        }
+        tarDelta = tarDelta->next;
+    }
+
+    if (tarDelta == delta->header) {
+        printf("Sensor %d not found in delta list.\n", sensor);
+        return;
+    }
+
+    printf("\nRecent trends:\n");
+    printf("Temperature change: %+d F\n", tarDelta->data.temperature);
+    printf("Humidity change:    %+d%%\n", tarDelta->data.humidity);
+    printf("Pressure change:    %+d mb\n", tarDelta->data.pressure);
+    printf("Wind change:        %+d mph\n", tarDelta->data.wind);
+
+    printf("\nForecast:\n");
+
+    if (target->data.pressure > 1020 && target->data.humidity < 40) {
+        printf("Clear and stable conditions expected.\n");
+    } else if (target->data.humidity > 85 &&
+               tarDelta->data.pressure < 0 &&
+               target->data.wind > 20) {
+        printf("Thunderstorms may be developing.\n");
+    } else if (target->data.humidity > 80 && tarDelta->data.pressure < 0) {
+        printf("Rain is likely.\n");
+    } else if (target->data.wind > 30) {
+        printf("Windy conditions expected.\n");
+    } else if (target->data.humidity > 60) {
+        printf("Cloudy or overcast conditions likely.\n");
+    } else {
+        printf("Partly cloudy with no major changes expected.\n");
+    }
+
+    printf("\n");
+}
+
+/*
+* printCities
+*
+* Displays list of cities and their corresponding ID numbers
+* for user to choose from for the forecasting function.
+*/
+void printCities(SensorList *list) {
+    printf("\nAvailable Cities\n");
+    printf("------------------------------------------------\n");
+    printf(" ID   City              ID   City\n");
+    printf("------------------------------------------------\n");
+
+    Node *curr = list->header->next;
+
+    while (curr != list->header) {
+        // Left column
+        printf(" %-3d %-18s",
+               curr->data.id,
+               curr->data.city);
+
+        curr = curr->next;
+
+        // Right column (only if another node exists)
+        if (curr != list->header) {
+            printf(" %-3d %-18s",
+                   curr->data.id,
+                   curr->data.city);
+            curr = curr->next;
+        }
+
+        printf("\n");
+    }
+
+    printf("------------------------------------------------\n");
+}
+
+//=============================================================================
 //                              Main Program
-//-----------------------------------------------------------------------------
+//=============================================================================
 
 
 int main(void) {
@@ -402,6 +520,8 @@ int main(void) {
 
     SensorList delta;
     initSensorList(&delta);
+
+    printCities(&currentList);
 
     return 0;
 
