@@ -30,21 +30,6 @@ typedef struct {
 } Sensor;
 
 /*
-* SensorDelta
-*
-* Structure for sensor deltas which will be used to compare previous 
-* sensor states to current states for weather prediction.
-*/
-typedef struct {
-    int id;
-    char city[CITY_LEN];
-    int tempDelta;
-    int humDelta;
-    int pressDelta;
-    int windDelta;
-} SensorDelta;
-
-/*
 * Node
 *
 * Node structure for the linked list that will connect all sensors.

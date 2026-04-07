@@ -383,7 +383,7 @@ void calculateDeltas(Sensor old[], Sensor new[], SensorDelta deltas[]) {
 }
 
 /*
-* weatherForecase
+* weatherForecast
 *
 * Takes user selection of city and provides a detailed look
 * at the current conditions, latest changes, and ultimately
