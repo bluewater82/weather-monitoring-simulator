@@ -1,4 +1,4 @@
-# Weather App 42,000
+# AtmosTrack: Regional Weather Simulator
 
 A C-based weather monitoring simulation that models environmental sensor data across multiple cities and provides statistical analysis, alerts, and simple forecasting.
 
@@ -9,7 +9,7 @@ The program generates simulated weather data for a network of sensors, allows th
 
 ## Overview
 
-Weather App 42,000 simulates a network of 50 weather sensors located across different cities. Each sensor records environmental conditions including:
+AtmosTrack simulates a network of 50 weather sensors located across different cities. Each sensor records environmental conditions including:
 
 - Temperature
 - Humidity

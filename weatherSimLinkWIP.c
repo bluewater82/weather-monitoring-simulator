@@ -188,6 +188,7 @@ Sensor makeSensor(const char *name, int *id) {
 
     // City name assignment
     strncpy(s.city, name, CITY_LEN-1);
+    s.city[CITY_LEN] = '\0';
 
     // Temperature normalization & some negative values
     s.temperature = rand() % 120;
@@ -800,7 +801,7 @@ void printStats(const Stats *stats) {
     printf("Rising Pressure:       %d\n", stats->risingPressureCities);
     printf("Falling Pressure:      %d\n", stats->fallingPressureCities);
     printf("Increasing Wind:       %d\n", stats->increasingWindCities);
-    printf("--------------------------------------------------\n");
+    printf("--------------------------------------------------\n\n");
 }
 
 /*
@@ -908,24 +909,46 @@ void windChillFactor(const SensorList *list) {
 
 
 //=============================================================================
+//                        USER I/O-RELATED FUNCTIONS
+//=============================================================================
+
+
+/*
+* printMenu
+*
+* This function prints out the menu for user prompting.
+*/
+void printMenu() {
+    printf("Main Menu\n");
+    printf("---------\n");
+    printf("Please choose an option from the following list:\n");
+    printf("1. Current weather conditions\n");
+    printf("2. Weather alerts\n");
+    printf("3. Highs & Lows\n");
+    printf("4. Update current conditions\n");
+    printf("5. City forecasts\n");
+    printf("6. Exit program\n");
+    printf("Type the number of your choice and press Enter.\n\n");
+}
+
+
+//=============================================================================
 //                              Main Program
 //=============================================================================
 
 
 int main(void) {
 
-
-    // Debugging functions and prints
-
     int id = 0;
     srand(time(NULL));
+    int userChoice = 0;
+    int userCityChoice = 0;
 
     SensorList currentList;
     initSensorList(&currentList);
 
     char cities[MAX_CITIES][CITY_LEN];
     int cityCount = loadCities("cities.txt", cities, MAX_CITIES);
-
     if (cityCount == 0) {
         printf("No cities were loaded.\n");
         return(1);
@@ -933,30 +956,79 @@ int main(void) {
 
     generateList(&currentList, cities, cityCount, &id);
     SensorList previous = copyList(&currentList);
-    printList(&currentList);
-
-    updateSensors(&currentList);
 
     SensorList delta;
     initSensorList(&delta);
 
-    printCities(&currentList);
-
     Stats stats;
 
-    computeStats(&currentList, &delta, &stats);
-    printStats(&stats);
 
+    printf("\n");
+    printf("--------------------------------------\n");
+    printf("             AtmosTrack\n");
+    printf("--------------------------------------\n\n");
+
+    while (userChoice != 6) {
+        printMenu();
+
+        scanf("%d", &userChoice);
+
+        switch (userChoice) {
+            case 1 :
+                printf("-----------------------\n");
+                printf("  Regional Conditions\n");
+                printf("-----------------------\n\n");
+                printList(&currentList);
+                computeStats(&currentList, &delta, &stats);
+                printStats(&stats);
+                printf("\a");
+                break;
+            case 2 :
+                printf("----------------------\n");
+                printf("   Weather Alerts\n");
+                printf("----------------------\n");
+                heatIndexReport(&currentList);
+                windChillFactor(&currentList);
+                printf("\a");
+                break;
+            case 3 :
+                printf("----------------------\n");
+                printf("  Highs & Lows\n");
+                printf("----------------------\n");
+                sortTemps(&currentList);
+                sortHumid(&currentList);
+                printf("\a");
+                break;
+            case 4 :
+                updateSensors(&currentList);
+                freeList(&delta);
+                initSensorList(&delta);
+                calculateDeltas(&previous, &currentList, &delta);
+                freeList(&previous);
+                previous = copyList(&currentList);
+                printf("\n----------------------------------------------\n");
+                printf("  ***Weather conditions have been updated***\n");
+                printf("----------------------------------------------\n\n");
+                printf("\a");
+                break;
+            case 5 :
+                printf("Please enter the ID of the city:\n");
+                printCities(&currentList);
+                scanf("%d", &userCityChoice);
+                weatherForecast(&currentList, &delta, userCityChoice);
+                printf("\a");
+                break;
+            case 6 :
+                printf("\n----------------------\n");
+                printf("Exiting program.\n");
+                printf("----------------------\n\n");
+                break;
+            default :
+                printf("\nInvalid input. Please choose from the menu.\n");
+        }
+    }
+    freeList(&currentList);
     freeList(&previous);
-    previous = copyList(&currentList);
-    updateSensors(&currentList);
     freeList(&delta);
-    initSensorList(&delta);
-    calculateDeltas(&previous, &currentList, &delta);
-
-    computeStats(&currentList, &delta, &stats);
-    printStats(&stats);
-
     return 0;
-
 }
