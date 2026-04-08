@@ -1,129 +1,117 @@
-# AtmosTrack: Regional Weather Simulator
+# 🌦️ AtmosTrack
+### Linked List Weather Simulation Engine in C
+A systems-level weather simulation written in C that models environmental conditions across a network of sensors using a **circular doubly linked list**, probabilistic event modeling, and time-step delta analysis.
 
-A C-based weather monitoring simulation that models environmental sensor data across multiple cities and provides statistical analysis, alerts, and simple forecasting.
+---
+### Preview
+![example of running program](assets/example_output.png)
 
-This project was designed as a learning exercise in fundamental computer science concepts including structs, arrays, file I/O, sorting algorithms, simulation modeling, and modular program design.
-
-The program generates simulated weather data for a network of sensors, allows the user to analyze the data through a menu-driven interface, and produces simple weather forecasts based on recent environmental trends.
-
-
-## Overview
-
-AtmosTrack simulates a network of 50 weather sensors located across different cities. Each sensor records environmental conditions including:
-
+---
+## Project Overview
+AtmosTrack simulates a distributed network of weather sensors, each tracking:
 - Temperature
 - Humidity
-- Atmospheric pressure
-- Wind speed
+- Atmospheric Pressure
+- Wind Speed
 
-The program generates initial conditions, then allows the user to:
+The system evolves over time using a **probabilistic weather engine**, enabling:
+- Realistic environmental changes
+- Trend detection via delta tracking
+- Rule-based forecasting
 
-- View current weather conditions
-- Analyze statistical summaries
-- Detect extreme weather conditions
-- Update the simulation with new weather events
-- Generate forecasts based on changing trends
-
-Weather conditions evolve using a **weighted probabilistic model**, meaning that changes in conditions resemble realistic weather behavior rather than purely random fluctuations.
-
-
-## Features
-### Sensor Network Simulation
-
-The program simulates a distributed network of weather stations using C structs.
-
-Each sensor contains:
-
+---
+## System Architecture
+### 🔗 Linked List Design
+AtmosTrack uses a circular doubly linked list with a sentinel node:
 ```
+typedef struct Node {
+    Sensor data;
+    struct Node *next;
+    struct Node *prev;
+} Node;
+
 typedef struct {
-    int id;
-    char city[CITY_LEN];
-    int temperature;
-    int humidity;
-    int pressure;
-    int windSpeed;
-} Sensor;
+    Node *header;
+    int size;
+} SensorList;
 ```
-Cities are loaded from a text file to give each sensor a realistic location name.
+**Why this matters**
+- Eliminates NULL edge cases
+- Simplifies traversal and insertion
+- Demonstrates real systems-level memory control
 
-### Weather Event System
-
-Weather updates are driven by a **probabilistic event model**.
-
-Possible weather events include:
-
-- Stable conditions
-- Mild warming and drying
-- Mild cooling and moistening
-- Falling pressure systems
-- Rising pressure systems
-- Humid unstable systems
-- Severe weather events
-
-Each event modifies environmental variables with controlled ranges to prevent unrealistic drift.
-
-### Weather Trend Tracking
-
-The program tracks how conditions change between updates using a secondary struct:
-
+---
+## Simulation Pipeline
+Each update cycle:
+1. Copy current state -> previous
+2. Apply probabilistic weather event -> current
+3. Compute differences -> delta
+4. Use delta for forecasting and analytics
 ```
-typedef struct {
-    char city[CITY_LEN];
-    int tempDelta;
-    int humDelta;
-    int pressDelta;
-    int windDelta;
-} SensorDelta;
+previous = copyList(&currentList);
+updateSensors(&currentList);
+calculateDeltas(&previous, &currentList, &delta);
 ```
-This allows the system to *analyze recent trends* rather than relying solely on current conditions.
 
-### Statistical Analysis
+![simulation flow diagram](assets/simulation_flow.png)
 
-The program calculates useful weather summaries including:
+---
+## Weather Engine (Core Logic)
+Weather evolves via weighted random events:
+| Event              | Effect             |
+| ------------------ | ------------------ |
+| Stable             | Minor fluctuations |
+| Warming/Drying     | Temp ↑ Humidity ↓  |
+| Cooling/Moistening | Temp ↓ Humidity ↑  |
+| Falling Pressure   | Storm signals      |
+| Rising Pressure    | Clear skies        |
+| Humid/Unstable     | Storm potential    |
+| Severe Event       | Large swings       |
 
-- Average temperature
-- Average humidity
-- Top 5 hottest cities
-- Top 5 coldest cities
-- Most humid locations
-- Driest locations
+This creates natural-feeling transitions as opposed to pure randomness.
 
-Sorting is implement using an **insertion sort algorithm**, demostrating the fundamental algorithmic technique.
+---
+## 📊 Data Analysis & Insights
+### Regional Statistics
+- Average temperature, humidity, pressure, and wind
+- Hottest and coldest cities
+- Trend metrics (warming, pressure shifts, change in wind)
 
-### Weather Alerts
+### Sorting Algorithms
+Insertion sort used to compute:
+- Hottest vs coldest cities
+- Wettest and driest cities
 
-The program idendifies potentially dangerous environmental conditions:
+---
+## Weather Alerts
+### 🔥Heat Index Advisory
+Detects dangerous heat + humidity combinations and issues warnings. Uses NOAA regression formula to compute the perceived elevated temperature.
+```
+feelsLike = -42.379 + 2.04901523*T + 10.14333127*RH ...
+```
+### ❄️Wind Chill Advisory
+Identifies frostbit-risk conditions and issues warnings. Uses the National Weather Service's formula for calculating the wind chill temperature.
+```
+feelsLike = 35.74 + 0.6215*T - 35.75*(v^0.16) + ...
+```
 
-- Heat Index Advisory - Uses official heat index formula to estimate perceived temperature when both heat and humidity are high.
-- Wind Chill Advisory - Uses the official wind chill formula to calculate the perceived temperature when wind and cold conditions are combined.
-
-These alerts highlight locations where exposure may be hazardous.
-
-### Forecast Engine
-
-Users can request a forecast for any city listed in the program.
-
-The forecast system analyzes:
-
-- Current atmospheric pressure
+---
+## Forecast Engine
+Forecasts combine:
+- Current conditions
+- Pressure trends
 - Humidity levels
-- Wind speed
-- Recent trends
+- Wind behavior
+Example:
+```
+if (pressure > 1020 && humidity < 40)
+    → Clear conditions
+else if (humidity > 85 && pressure falling)
+    → Thunderstorms likely
+```
 
-Example forecast outputs include:
-
-- Clear and stable conditions
-- Thunderstorm development
-- Rain likely
-- Cloudy or overcast
-- Windy conditions
-
-Although this is a simplified model, the system demonstrates how multiple environmental variable can be combined to infer likely weather outcomes.
-
-## Program Menu
-
-The program is controlled through a menu-driven interface.
-
+---
+## 🖥️User Interface
 ```
 Main Menu
 ---------
@@ -135,45 +123,9 @@ Main Menu
 6. Exit program
 ```
 
-## Example Workflow
-
-1. Program initializes sensors with simulated data
-2. User views current conditions
-3. Weather alerts highlight dangerous areas
-4. User updates the simulation
-5. Environmental trends are calculated
-6. Forecasts can be generated for individual cities
-7. User can loop through any option until exiting program
-
-## Technologies Used
-
-Language:
-
- - C
-
- Standard Libraries:
-
- - stdio.h
- - stdlib.h
- - string.h
- - math.h
- - limits.h
- - time.h
-
- Concepts demonstrated:
-
- - Struct-based data modeling
- - File input/output
- - Randomized simulation
- - Probabilistic event modeling
- - Sorting algorithms
- - Statistical analysis
- - Menu-driven user interfaces
- - Modular function design
-
-## Input File
-
-The program reads city names from a simple text file:
+---
+## Input Data
+Imports .txt files that contain city names to use in the data assignment for each sensor struct.
 ```
 cities.txt
 ```
@@ -181,83 +133,58 @@ Example:
 ```
 Albuquerque
 Denver
-Seattle
-Chicago
+Santa Fe
+Los Angeles
 Phoenix
-```
-There are currently 100 city names stored in the file, but if the number of sensors were raised above the number of cities provided in the file the program will automatically generate names such as:
-```
-Station_153
-Station_ 154
-```
-
-## Compilation
-
-Although a compiled artifact is already provided, users can manually compile using GCC:
-```
-gcc weatherProgram.c -o weather
-```
-Run the program:
-```
-./weather
-```
-
-## Example Output
-
-Example table:
-```
-Sensor  City            Temperature  Humidity
------------------------------------------------
-1       Albuquerque          74 F      42%
-2       Denver               61 F      55%
-3       Seattle              58 F      81%
 ...
 ```
-Example forecast:
+
+---
+## Build & Run
+Git repo contains executable file but users can compile and run the source on their own machine using:
 ```
-Forecast for Denver
-
-Current temperature: 61 F
-Current humidity: 55%
-Current pressure: 1015 mb
-Current wind speed: 12 mph
-
-Recent trends:
-Temperature change: -2 F
-Humidity change: +4%
-Pressure change: -3 mb
-Wind change: +5 mph
-
-Forecast:
-Rain is likely.
+gcc weatherSimLinkWIP.c -o atmos -lm
+./atmos
 ```
+*Note: root folder must contain a cities.txt file for program to compile correctly.
 
-## Future Improvements
+---
+## Key Technical Concepts
+### Data Structures
+- Circular doubly linked lists
+- Sentinel node (header) pattern
+### Memory Management
+- Dynamic allocation (malloc, free)
+- Deep copying vs mutation for different functions
+### Algorithms
+- Insertion sort
+- Traversal patterns
+### Simulation Design
+- Probabilistic modeling
+- Constraint clamping
+- State-delta comparison
 
-Planned enhancements include:
+---
+## What Makes This Project Stand Out
+This is not just a CRUD-style program.
 
-- Time-series weather tracking
-- Regional climate modeling
-- Improved forecasting logic
-- Median, variance, and standard deviation analysis
-- Wind advisory detection/alerts
-- More realistic atmospheric models
+It demonstrates:
+- System-level thinking in C
+- Dynamic data structures as opposed to just static arrays
+- Stateful simulation over time
+- Real-world modeling (weather dynamics)
+- Separation of concerns (data, logic, UI)
+
+---
+## Future Enhancements
+- Time-series history tracking
+- Multi-region climate simulation
+- Graph-based visualization such as plots
 - Persistent data logging
-- Graphical visualization tools
+- Advanced forecasting using ML integration
 
-## Learning Goals
+---
+## 👤 Author
 
-This project was built to reinforce core programming skills including:
-
-- Struct-based data modeling
-- Modular program design
-- Data analysis from simulated systems
-- Implementation of classical algorithms
-- Designing scalable command-line programs
-
-## Author
-
-- Andre DeHerrera
-- Computer Science Major
-- University of New Mexico
-
+### Andre DeHerrera
+Computer Science — University of New Mexico
