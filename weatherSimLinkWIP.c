@@ -9,6 +9,14 @@
 #define CITY_LEN 64
 #define MAX_CITIES 100
 
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+#define CYAN    "\033[36m"
+#define WHITE   "\033[37m"
+#define RESET   "\033[0m"
+
 
 //=============================================================================
 //                                Structures
@@ -244,8 +252,8 @@ void generateList(SensorList *list, char cities[][CITY_LEN], int cityCount, int 
 */
 void printList(SensorList *list) {
     Node *current = list->header->next;
-    printf("Sensor ID       City       Temperature   Humidity   Pressure    Wind Speed\n");
-    printf("--------------------------------------------------------------------------\n");
+    printf(YELLOW "Sensor ID       City       Temperature   Humidity   Pressure    Wind Speed\n" RESET);
+    printf(YELLOW "--------------------------------------------------------------------------\n" RESET);
     while (current != list->header) {
         printf("%3d     %16s     %4d F     %5d%%     %7d     %5d MPH\n",
         current->data.id, current->data.city, current->data.temperature,
@@ -454,8 +462,8 @@ void weatherForecast(SensorList *currentList, SensorList *delta, int sensor) {
         return;
     }
 
-    printf("\nForecast for %s\n", target->data.city);
-    printf("-----------------------------\n");
+    printf(YELLOW "\nForecast for: %s\n", target->data.city, RESET);
+    printf(YELLOW "------------------------------------------\n" RESET);
 
     printf("Current temperature: %d F\n", target->data.temperature);
     printf("Current humidity:    %d%%\n", target->data.humidity);
@@ -476,13 +484,13 @@ void weatherForecast(SensorList *currentList, SensorList *delta, int sensor) {
         return;
     }
 
-    printf("\nRecent trends:\n");
+    printf(YELLOW "\nRecent trends (since last update):\n" RESET);
     printf("Temperature change: %+d F\n", tarDelta->data.temperature);
     printf("Humidity change:    %+d%%\n", tarDelta->data.humidity);
     printf("Pressure change:    %+d mb\n", tarDelta->data.pressure);
     printf("Wind change:        %+d mph\n", tarDelta->data.wind);
 
-    printf("\nForecast:\n");
+    printf(YELLOW "\nForecast:\n" RESET);
 
     if (target->data.pressure > 1020 && target->data.humidity < 40) {
         printf("Clear and stable conditions expected.\n");
@@ -510,10 +518,10 @@ void weatherForecast(SensorList *currentList, SensorList *delta, int sensor) {
 * for user to choose from for the forecasting function.
 */
 void printCities(SensorList *list) {
-    printf("\nAvailable Cities\n");
-    printf("------------------------------------------------\n");
-    printf(" ID   City              ID   City\n");
-    printf("------------------------------------------------\n");
+    printf(YELLOW "\n     Available Cities\n");
+    printf(YELLOW "    -----------------------\n" RESET);
+    printf(YELLOW " ID   City              ID   City\n" RESET);
+    printf(YELLOW "------------------------------------------------\n" RESET);
 
     Node *curr = list->header->next;
 
@@ -587,17 +595,17 @@ void sortTemps(const SensorList *list) {
 
     int topCount = (count < 5) ? count : 5;
 
-    printf("\nThe five hottest cities are:\n");
-    printf(" City              Temperature\n");
-    printf("-------------------------------\n");
+    printf(YELLOW "\nThe five hottest cities are:\n" RESET);
+    printf(YELLOW " City              Temperature\n" RESET);
+    printf(YELLOW "-------------------------------\n" RESET);
     for (int j = count - 1; j >= count - topCount; j--) {
         printf(" %-17s %3d F\n", tempSorted[j].city, tempSorted[j].temperature);
     }
 
-    printf("-------------------------------\n");
-    printf("The five coldest cities are:\n");
-    printf(" City              Temperature\n");
-    printf("-------------------------------\n");
+    printf(YELLOW "-------------------------------\n" RESET);
+    printf(YELLOW "The five coldest cities are:\n" RESET);
+    printf(YELLOW " City              Temperature\n" RESET);
+    printf(YELLOW "-------------------------------\n" RESET);
     for (int j = 0; j < topCount; j++) {
         printf(" %-17s %3d F\n", tempSorted[j].city, tempSorted[j].temperature);
     }
@@ -648,17 +656,17 @@ void sortHumid(const SensorList *list) {
 
     int topCount = (count < 5) ? count : 5;
 
-    printf("\nThe five wettest cities are:\n");
-    printf(" City              Humidity\n");
-    printf("-------------------------------\n");
+    printf(YELLOW "\nThe five wettest cities are:\n" RESET);
+    printf(YELLOW " City              Humidity\n" RESET);
+    printf(YELLOW "-------------------------------\n" RESET);
     for (int j = count - 1; j >= count - topCount; j--) {
         printf(" %-17s %3d%%\n", humSorted[j].city, humSorted[j].humidity);
     }
 
-    printf("-------------------------------\n");
-    printf("The five driest cities are:\n");
-    printf(" City              Humidity\n");
-    printf("-------------------------------\n");
+    printf(YELLOW "-------------------------------\n" RESET);
+    printf(YELLOW "The five driest cities are:\n" RESET);
+    printf(YELLOW " City              Humidity\n" RESET);
+    printf(YELLOW "-------------------------------\n" RESET);
     for (int j = 0; j < topCount; j++) {
         printf(" %-17s %3d%%\n", humSorted[j].city, humSorted[j].humidity);
     }
@@ -781,8 +789,8 @@ void computeStats(const SensorList *currentList, const SensorList *deltaList, St
 * Print function for displaying regional stats.
 */
 void printStats(const Stats *stats) {
-    printf("\nRegional Weather Summary\n");
-    printf("--------------------------------------------------\n");
+    printf(YELLOW "\nRegional Weather Summary\n" RESET);
+    printf(YELLOW "--------------------------------------------------\n" RESET);
     printf("Average Temp:          %.1f F\n", stats->avgTemp);
     printf("Average Humidity:      %.1f%%\n", stats->avgHumidity);
     printf("Average Pressure:      %.1f mb\n", stats->avgPressure);
@@ -820,11 +828,11 @@ void heatIndexReport(const SensorList *list) {
     Node *curr = list->header->next;
     int foundAny = 0;
 
-    printf("\n***ADVISORY*** HEAT INDEX:\n");
-    printf("The following locations are experiencing higher risk\n");
-    printf("of heat stroke due to elevated temperature and humidity:\n\n");
-    printf(" City               Actual   Feels Like\n");
-    printf("--------------------------------------------\n");
+    printf(RED "\n***ADVISORY*** HEAT INDEX:\n" RESET);
+    printf(YELLOW "The following locations are experiencing higher risk\n" RESET);
+    printf(YELLOW "of heat stroke due to elevated temperature and humidity:\n\n" RESET);
+    printf(YELLOW " City               Actual   Feels Like\n" RESET);
+    printf(YELLOW "--------------------------------------------\n" RESET);
 
     while (curr != list->header) {
         if (curr->data.temperature >= 88 && curr->data.humidity >= 40) {
@@ -872,11 +880,11 @@ void windChillFactor(const SensorList *list) {
     Node *curr = list->header->next;
     int foundAny = 0;
 
-    printf("\n***ADVISORY*** WIND CHILL:\n");
-    printf("The following locations are experiencing increased\n");
-    printf("risk of frostbite due to low temperatures and wind speeds:\n\n");
-    printf(" City               Actual   Feels Like\n");
-    printf("--------------------------------------------\n");
+    printf(RED "\n***ADVISORY*** WIND CHILL:\n" RESET);
+    printf(YELLOW "The following locations are experiencing increased\n" RESET);
+    printf(YELLOW "risk of frostbite due to low temperatures and wind speeds:\n\n" RESET);
+    printf(YELLOW " City               Actual   Feels Like\n" RESET);
+    printf(YELLOW "--------------------------------------------\n" RESET);
 
     while (curr != list->header) {
         if (curr->data.temperature <= 40 && curr->data.wind > 3) {
@@ -919,15 +927,14 @@ void windChillFactor(const SensorList *list) {
 * This function prints out the menu for user prompting.
 */
 void printMenu() {
-    printf("Main Menu\n");
-    printf("---------\n");
-    printf("Please choose an option from the following list:\n");
-    printf("1. Current weather conditions\n");
-    printf("2. Weather alerts\n");
-    printf("3. Highs & Lows\n");
-    printf("4. Update current conditions\n");
-    printf("5. City forecasts\n");
-    printf("6. Exit program\n");
+    printf(CYAN "                    Main Menu\n\n" RESET);
+
+    printf("  1. Current weather conditions\n");
+    printf("  2. Weather alerts\n");
+    printf("  3. Highs & Lows\n");
+    printf("  4. Update current conditions\n");
+    printf("  5. City forecasts\n");
+    printf("  6. Exit program\n\n");
     printf("Type the number of your choice and press Enter.\n\n");
 }
 
@@ -964,9 +971,8 @@ int main(void) {
 
 
     printf("\n");
-    printf("--------------------------------------\n");
-    printf("             AtmosTrack\n");
-    printf("--------------------------------------\n\n");
+    printf(CYAN "====================ATMOSTRACK====================\n" RESET);
+    printf(CYAN "       Regional Weather Simulation System\n\n\n" RESET);
 
     while (userChoice != 6) {
         printMenu();
@@ -975,26 +981,24 @@ int main(void) {
 
         switch (userChoice) {
             case 1 :
-                printf("-----------------------\n");
-                printf("  Regional Conditions\n");
-                printf("-----------------------\n\n");
+
+                printf(CYAN "                        Regional Conditions\n" RESET);
+                printf(CYAN "               ------------------------------------\n\n" RESET);
                 printList(&currentList);
                 computeStats(&currentList, &delta, &stats);
                 printStats(&stats);
                 printf("\a");
                 break;
             case 2 :
-                printf("----------------------\n");
-                printf("   Weather Alerts\n");
-                printf("----------------------\n");
+                printf(RED "             Weather Alerts\n" RESET);
+                printf(RED "         ----------------------\n" RESET);
                 heatIndexReport(&currentList);
                 windChillFactor(&currentList);
                 printf("\a");
                 break;
             case 3 :
-                printf("----------------------\n");
-                printf("  Highs & Lows\n");
-                printf("----------------------\n");
+                printf(CYAN "         Highs & Lows\n" RESET);
+                printf(CYAN "    ----------------------\n" RESET);
                 sortTemps(&currentList);
                 sortHumid(&currentList);
                 printf("\a");
@@ -1006,9 +1010,8 @@ int main(void) {
                 calculateDeltas(&previous, &currentList, &delta);
                 freeList(&previous);
                 previous = copyList(&currentList);
-                printf("\n----------------------------------------------\n");
-                printf("  ***Weather conditions have been updated***\n");
-                printf("----------------------------------------------\n\n");
+                printf(CYAN "    ***Weather conditions have been updated***\n" RESET);
+                printf(CYAN "--------------------------------------------------\n\n" RESET);
                 printf("\a");
                 break;
             case 5 :
@@ -1019,9 +1022,8 @@ int main(void) {
                 printf("\a");
                 break;
             case 6 :
-                printf("\n----------------------\n");
-                printf("Exiting program.\n");
-                printf("----------------------\n\n");
+                printf(CYAN "        Exiting program.\n" RESET);
+                printf(CYAN "     ----------------------\n\n" RESET);
                 break;
             default :
                 printf("\nInvalid input. Please choose from the menu.\n");
