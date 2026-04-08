@@ -51,6 +51,34 @@ typedef struct {
     int size;
 } SensorList;
 
+/*
+* Stats
+*
+* Structure for data used in statistical analysis
+*/
+typedef struct {
+    double avgTemp;
+    double avgHumidity;
+    double avgPressure;
+    double avgWind;
+
+    int minTemp;
+    int maxTemp;
+    char minCity[CITY_LEN];
+    char maxCity[CITY_LEN];
+
+    double avgTempChange;
+    double avgHumidityChange;
+    double avgPressureChange;
+    double avgWindChange;
+
+    int warmingCities;
+    int coolingCities;
+    int risingPressureCities;
+    int fallingPressureCities;
+    int increasingWindCities;
+} Stats;
+
 
 //=============================================================================
 //                              City Importing
@@ -286,60 +314,80 @@ int clamp(int value, int min, int max) {
 * extremes over many refreshes.
 */
 void updateSensors(SensorList *list) {
+    if (list == NULL || list->header == NULL || list->size == 0) {
+        return;
+    }
+
     unsigned int event;
     unsigned int weatherRoll = rand() % 101;
+
+    if (weatherRoll <= 34) {          // stable
+        event = 0;
+    } else if (weatherRoll <= 54) {   // mild warming & drying
+        event = 1;
+    } else if (weatherRoll <= 69) {   // mild cooling & moistening
+        event = 2;
+    } else if (weatherRoll <= 79) {   // falling pressure & unsettling
+        event = 3;
+    } else if (weatherRoll <= 89) {   // rising pressure & clearing
+        event = 4;
+    } else if (weatherRoll <= 96) {   // humid & unstable
+        event = 5;
+    } else {                          // severe event
+        event = 6;
+    }
 
     Node *curr = list->header->next;
 
     while (curr != list->header) {
         switch (event) {
-            case 0:   // stable
-                curr->data.temperature += (rand() % 2) - 1;
-                curr->data.humidity += (rand() % 4) - 1;
-                curr->data.pressure += (rand() % 2) - 1;
-                curr->data.wind += (rand() % 3) - 1;
+            case 0:   // stable: slight local wobble in either direction
+                curr->data.temperature += (rand() % 3) - 1;   // -1 to +1
+                curr->data.humidity    += (rand() % 3) - 1;   // -1 to +1
+                curr->data.pressure    += (rand() % 3) - 1;   // -1 to +1
+                curr->data.wind        += (rand() % 3) - 1;   // -1 to +1
                 break;
 
-            case 1:   // mild warming & drying
-                curr->data.temperature += (rand() % 3) + 1;
-                curr->data.humidity -= (rand() % 5) + 2;
-                curr->data.pressure += rand() % 3;
-                curr->data.wind += (rand() % 4) - 1;
+            case 1:   // mild warming & drying: mostly warmer, but a few flat/slightly cooler
+                curr->data.temperature += (rand() % 5) - 1;   // -1 to +3
+                curr->data.humidity    -= (rand() % 5) + 2;   // -2 to -6
+                curr->data.pressure    += rand() % 3;         // 0 to +2
+                curr->data.wind        += (rand() % 4) - 1;   // -1 to +2
                 break;
 
-            case 2:   // mild cooling & moistening
-                curr->data.temperature -= (1 + rand() % 3);
-                curr->data.humidity += (rand() % 4) + 2;
-                curr->data.pressure += (rand() % 2) - 1;
-                curr->data.wind += rand() % 4;
+            case 2:   // mild cooling & moistening: mostly cooler, but a few flat/slightly warmer
+                curr->data.temperature += (rand() % 5) - 3;   // -3 to +1
+                curr->data.humidity    += (rand() % 4) + 2;   // +2 to +5
+                curr->data.pressure    += (rand() % 3) - 1;   // -1 to +1
+                curr->data.wind        += rand() % 4;         // 0 to +3
                 break;
 
             case 3:   // falling pressure & unsettling
-                curr->data.temperature += (rand() % 4) - 2;
-                curr->data.humidity += (rand() % 8) + 1;
-                curr->data.pressure -= (rand() % 3) + 2;
-                curr->data.wind += (rand() % 5) + 2;
+                curr->data.temperature += (rand() % 5) - 2;   // -2 to +2
+                curr->data.humidity    += (rand() % 8) + 1;   // +1 to +8
+                curr->data.pressure    -= (rand() % 3) + 2;   // -2 to -4
+                curr->data.wind        += (rand() % 5) + 2;   // +2 to +6
                 break;
 
-            case 4:   // rising pressure & clearing
-                curr->data.temperature += (rand() % 4) - 1;
-                curr->data.humidity -= (rand() % 6) - 3;
-                curr->data.pressure += (rand() % 3) + 2;
-                curr->data.wind += (rand() % 3) - 2;
+            case 4:   // rising pressure & clearing: fixed drying logic
+                curr->data.temperature += (rand() % 4) - 1;   // -1 to +2
+                curr->data.humidity    -= (rand() % 4) + 1;   // -1 to -4
+                curr->data.pressure    += (rand() % 3) + 2;   // +2 to +4
+                curr->data.wind        += (rand() % 3) - 2;   // -2 to 0
                 break;
 
             case 5:   // humid & unstable
-                curr->data.temperature += rand() % 4;
-                curr->data.humidity += (rand() % 7) + 4;
-                curr->data.pressure -= (rand() % 3) + 1;
-                curr->data.wind += rand() % 6;
+                curr->data.temperature += (rand() % 5) - 1;   // -1 to +3
+                curr->data.humidity    += (rand() % 7) + 4;   // +4 to +10
+                curr->data.pressure    -= (rand() % 3) + 1;   // -1 to -3
+                curr->data.wind        += rand() % 6;         // 0 to +5
                 break;
 
             case 6:   // severe event
-                curr->data.temperature += (rand() % 12) - 6;
-                curr->data.humidity += (rand() % 26) - 10;
-                curr->data.pressure += (rand() % 9) - 4;
-                curr->data.wind += (rand() % 8) + 5;
+                curr->data.temperature += (rand() % 13) - 6;  // -6 to +6
+                curr->data.humidity    += (rand() % 26) - 10; // -10 to +15
+                curr->data.pressure    += (rand() % 9) - 4;   // -4 to +4
+                curr->data.wind        += (rand() % 8) + 5;   // +5 to +12
                 break;
         }
 
@@ -349,7 +397,6 @@ void updateSensors(SensorList *list) {
 
         curr = curr->next;
     }
-    
 }
 
 /*
@@ -491,12 +538,384 @@ void printCities(SensorList *list) {
     printf("------------------------------------------------\n");
 }
 
+
+//=============================================================================
+//                         Statistical Functions
+//=============================================================================
+
+
+/*
+* sortTemps
+*
+* Utilizes insertion sort algorithm to sort the sensor array
+* based on temperature values and then prints the top five
+* locations with the highest and lowest temperatures.
+*/
+void sortTemps(const SensorList *list) {
+    if (list == NULL || list->header == NULL || list->size == 0) {
+        printf("No sensor data available.\n");
+        return;
+    }
+
+    int count = list->size;
+    Sensor *tempSorted = malloc(count * sizeof(Sensor));
+    if (tempSorted == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    Node *curr = list->header->next;
+    int i = 0;
+
+    while (curr != list->header && i < count) {
+        tempSorted[i] = curr->data;
+        curr = curr->next;
+        i++;
+    }
+
+    for (int k = 1; k < count; k++) {
+        Sensor key = tempSorted[k];
+        int h = k - 1;
+
+        while (h >= 0 && tempSorted[h].temperature > key.temperature) {
+            tempSorted[h + 1] = tempSorted[h];
+            h--;
+        }
+        tempSorted[h + 1] = key;
+    }
+
+    int topCount = (count < 5) ? count : 5;
+
+    printf("\nThe five hottest cities are:\n");
+    printf(" City              Temperature\n");
+    printf("-------------------------------\n");
+    for (int j = count - 1; j >= count - topCount; j--) {
+        printf(" %-17s %3d F\n", tempSorted[j].city, tempSorted[j].temperature);
+    }
+
+    printf("-------------------------------\n");
+    printf("The five coldest cities are:\n");
+    printf(" City              Temperature\n");
+    printf("-------------------------------\n");
+    for (int j = 0; j < topCount; j++) {
+        printf(" %-17s %3d F\n", tempSorted[j].city, tempSorted[j].temperature);
+    }
+    printf("-------------------------------\n");
+
+    free(tempSorted);
+}
+
+/*
+* sortHumid
+*
+* Utilizes insertion sort algorithm to sort the sensor array
+* based on temperature values and then prints the top five
+* locations with the highest and lowest temperatures.
+*/
+void sortHumid(const SensorList *list) {
+    if (list == NULL || list->header == NULL || list->size == 0) {
+        printf("No sensor data available.\n");
+        return;
+    }
+
+    int count = list->size;
+    Sensor *humSorted = malloc(count * sizeof(Sensor));
+    if (humSorted == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    Node *curr = list->header->next;
+    int i = 0;
+
+    while (curr != list->header && i < count) {
+        humSorted[i] = curr->data;
+        curr = curr->next;
+        i++;
+    }
+
+    for (int k = 1; k < count; k++) {
+        Sensor key = humSorted[k];
+        int h = k - 1;
+
+        while (h >= 0 && humSorted[h].humidity > key.humidity) {
+            humSorted[h + 1] = humSorted[h];
+            h--;
+        }
+        humSorted[h + 1] = key;
+    }
+
+    int topCount = (count < 5) ? count : 5;
+
+    printf("\nThe five wettest cities are:\n");
+    printf(" City              Humidity\n");
+    printf("-------------------------------\n");
+    for (int j = count - 1; j >= count - topCount; j--) {
+        printf(" %-17s %3d%%\n", humSorted[j].city, humSorted[j].humidity);
+    }
+
+    printf("-------------------------------\n");
+    printf("The five driest cities are:\n");
+    printf(" City              Humidity\n");
+    printf("-------------------------------\n");
+    for (int j = 0; j < topCount; j++) {
+        printf(" %-17s %3d%%\n", humSorted[j].city, humSorted[j].humidity);
+    }
+    printf("-------------------------------\n");
+
+    free(humSorted);
+}
+
+/*
+* computeStats
+*
+* Function that performs some statistical analysis on the sensor data 
+* to provide useful (simulated) information for the user.
+*/
+void computeStats(const SensorList *currentList, const SensorList *deltaList, Stats *stats) {
+    if (currentList == NULL || currentList->header == NULL || currentList->size == 0) {
+        return;
+    }
+
+    Node *curr = currentList->header->next;
+
+    int sumTemp = 0;
+    int sumHumidity = 0;
+    int sumPressure = 0;
+    int sumWind = 0;
+    int count = 0;
+
+    stats->minTemp = INT_MAX;
+    stats->maxTemp = INT_MIN;
+
+    while (curr != currentList->header) {
+        int temp = curr->data.temperature;
+
+        sumTemp += curr->data.temperature;
+        sumHumidity += curr->data.humidity;
+        sumPressure += curr->data.pressure;
+        sumWind += curr->data.wind;
+
+        if (temp < stats->minTemp) {
+            stats->minTemp = temp;
+            strncpy(stats->minCity, curr->data.city, CITY_LEN - 1);
+            stats->minCity[CITY_LEN - 1] = '\0';
+        }
+
+        if (temp > stats->maxTemp) {
+            stats->maxTemp = temp;
+            strncpy(stats->maxCity, curr->data.city, CITY_LEN - 1);
+            stats->maxCity[CITY_LEN - 1] = '\0';
+        }
+
+        count++;
+        curr = curr->next;
+    }
+
+    stats->avgTemp = (double)sumTemp / count;
+    stats->avgHumidity = (double)sumHumidity / count;
+    stats->avgPressure = (double)sumPressure / count;
+    stats->avgWind = (double)sumWind / count;
+
+    stats->avgTempChange = 0.0;
+    stats->avgHumidityChange = 0.0;
+    stats->avgPressureChange = 0.0;
+    stats->avgWindChange = 0.0;
+
+    stats->warmingCities = 0;
+    stats->coolingCities = 0;
+    stats->risingPressureCities = 0;
+    stats->fallingPressureCities = 0;
+    stats->increasingWindCities = 0;
+
+    if (deltaList == NULL || deltaList->header == NULL || deltaList->size == 0) {
+        return;
+    }
+
+    Node *delt = deltaList->header->next;
+
+    int sumTempChange = 0;
+    int sumHumidityChange = 0;
+    int sumPressureChange = 0;
+    int sumWindChange = 0;
+    int deltaCount = 0;
+
+    while (delt != deltaList->header) {
+        sumTempChange += delt->data.temperature;
+        sumHumidityChange += delt->data.humidity;
+        sumPressureChange += delt->data.pressure;
+        sumWindChange += delt->data.wind;
+
+        if (delt->data.temperature > 0) {
+            stats->warmingCities++;
+        } else if (delt->data.temperature < 0) {
+            stats->coolingCities++;
+        }
+
+        if (delt->data.pressure > 0) {
+            stats->risingPressureCities++;
+        } else if (delt->data.pressure < 0) {
+            stats->fallingPressureCities++;
+        }
+
+        if (delt->data.wind > 0) {
+            stats->increasingWindCities++;
+        }
+
+        deltaCount++;
+        delt = delt->next;
+    }
+
+    if (deltaCount > 0) {
+        stats->avgTempChange = (double)sumTempChange / deltaCount;
+        stats->avgHumidityChange = (double)sumHumidityChange / deltaCount;
+        stats->avgPressureChange = (double)sumPressureChange / deltaCount;
+        stats->avgWindChange = (double)sumWindChange / deltaCount;
+    }
+}
+
+/*
+* printStats
+*
+* Print function for displaying regional stats.
+*/
+void printStats(const Stats *stats) {
+    printf("\nRegional Weather Summary\n");
+    printf("--------------------------------------------------\n");
+    printf("Average Temp:          %.1f F\n", stats->avgTemp);
+    printf("Average Humidity:      %.1f%%\n", stats->avgHumidity);
+    printf("Average Pressure:      %.1f mb\n", stats->avgPressure);
+    printf("Average Wind:          %.1f mph\n", stats->avgWind);
+    printf("\n");
+    printf("Hottest City:          %s (%d F)\n", stats->maxCity, stats->maxTemp);
+    printf("Coldest City:          %s (%d F)\n", stats->minCity, stats->minTemp);
+    printf("\n");
+    printf("Average Temp Change:   %+0.1f F\n", stats->avgTempChange);
+    printf("Average Humidity Chg:  %+0.1f%%\n", stats->avgHumidityChange);
+    printf("Average Pressure Chg:  %+0.1f mb\n", stats->avgPressureChange);
+    printf("Average Wind Change:   %+0.1f mph\n", stats->avgWindChange);
+    printf("\n");
+    printf("Warming Cities:        %d\n", stats->warmingCities);
+    printf("Cooling Cities:        %d\n", stats->coolingCities);
+    printf("Rising Pressure:       %d\n", stats->risingPressureCities);
+    printf("Falling Pressure:      %d\n", stats->fallingPressureCities);
+    printf("Increasing Wind:       %d\n", stats->increasingWindCities);
+    printf("--------------------------------------------------\n");
+}
+
+/*
+* heatIndexReport
+*
+* This function uses the Heat Index formula to calculate what it feels
+* like given a relationship between temperature and humidity levels.
+* It then prints out warning about the increased felt temperature.
+*/
+void heatIndexReport(const SensorList *list) {
+    if (list == NULL || list->header == NULL || list->size == 0) {
+        printf("\nNo sensor data available.\n\n");
+        return;
+    }
+
+    Node *curr = list->header->next;
+    int foundAny = 0;
+
+    printf("\n***ADVISORY*** HEAT INDEX:\n");
+    printf("The following locations are experiencing higher risk\n");
+    printf("of heat stroke due to elevated temperature and humidity:\n\n");
+    printf(" City               Actual   Feels Like\n");
+    printf("--------------------------------------------\n");
+
+    while (curr != list->header) {
+        if (curr->data.temperature >= 88 && curr->data.humidity >= 40) {
+            double feelsLike = -42.379
+                + 2.04901523 * curr->data.temperature
+                + 10.14333127 * curr->data.humidity
+                - 0.22475541 * curr->data.temperature * curr->data.humidity
+                - 0.00683783 * curr->data.temperature * curr->data.temperature
+                - 0.05481717 * curr->data.humidity * curr->data.humidity
+                + 0.00122874 * curr->data.temperature * curr->data.temperature * curr->data.humidity
+                + 0.00085282 * curr->data.temperature * curr->data.humidity * curr->data.humidity
+                - 0.00000199 * curr->data.temperature * curr->data.temperature
+                  * curr->data.humidity * curr->data.humidity;
+
+            printf(" %-18s %3d F %8d F\n",
+                   curr->data.city,
+                   curr->data.temperature,
+                   (int)feelsLike);
+
+            foundAny = 1;
+        }
+
+        curr = curr->next;
+    }
+
+    if (!foundAny) {
+        printf(" No locations currently meet heat-index advisory criteria.\n");
+    }
+
+    printf("\n");
+}
+
+/*
+* windChillFactor
+*
+* This function checks for temperature and wind speed combinations that would
+* lead to dangerous exposure conditions and then prints the locations in an
+* advisory report*/
+void windChillFactor(const SensorList *list) {
+    if (list == NULL || list->header == NULL || list->size == 0) {
+        printf("\nNo sensor data available.\n\n");
+        return;
+    }
+
+    Node *curr = list->header->next;
+    int foundAny = 0;
+
+    printf("\n***ADVISORY*** WIND CHILL:\n");
+    printf("The following locations are experiencing increased\n");
+    printf("risk of frostbite due to low temperatures and wind speeds:\n\n");
+    printf(" City               Actual   Feels Like\n");
+    printf("--------------------------------------------\n");
+
+    while (curr != list->header) {
+        if (curr->data.temperature <= 40 && curr->data.wind > 3) {
+
+            double base = curr->data.wind;
+            double exponent = 0.16;
+
+            double feelsLike = 35.74
+                + 0.6215 * curr->data.temperature
+                - 35.75 * pow(base, exponent)
+                + 0.4275 * curr->data.temperature * pow(base, exponent);
+
+            printf(" %-18s %3d F %8d F\n",
+                   curr->data.city,
+                   curr->data.temperature,
+                   (int)feelsLike);
+
+            foundAny = 1;
+        }
+
+        curr = curr->next;
+    }
+
+    if (!foundAny) {
+        printf(" No locations currently meet wind chill advisory criteria.\n");
+    }
+
+    printf("\n");
+}
+
+
 //=============================================================================
 //                              Main Program
 //=============================================================================
 
 
 int main(void) {
+
+
+    // Debugging functions and prints
 
     int id = 0;
     srand(time(NULL));
@@ -522,6 +941,21 @@ int main(void) {
     initSensorList(&delta);
 
     printCities(&currentList);
+
+    Stats stats;
+
+    computeStats(&currentList, &delta, &stats);
+    printStats(&stats);
+
+    freeList(&previous);
+    previous = copyList(&currentList);
+    updateSensors(&currentList);
+    freeList(&delta);
+    initSensorList(&delta);
+    calculateDeltas(&previous, &currentList, &delta);
+
+    computeStats(&currentList, &delta, &stats);
+    printStats(&stats);
 
     return 0;
 
