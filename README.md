@@ -102,6 +102,7 @@ Forecasts combine:
 - Pressure trends
 - Humidity levels
 - Wind behavior
+
 Example:
 ```
 if (pressure > 1020 && humidity < 40)
