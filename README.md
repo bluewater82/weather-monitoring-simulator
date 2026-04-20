@@ -104,9 +104,11 @@ The Java build is packaged into an executable `.jar`, making it easier to run as
 
 
 ![Legacy C Screenshot](assets/example_output.png)
+
 Legacy C terminal example
 
 ![Java UI Screenshot](assets/screenshotAtmos.png)
+
 New Java UI
 
 ---
