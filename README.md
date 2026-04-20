@@ -126,6 +126,7 @@ gcc weatherSimLinkWIP.c -o atmos -lm
 
 ### Java Version
 Build and package through IntelliJ or your preferred Java build process, ensuring image assets are included in the artifact as resources.
+You can also download the pre-packaged JAR file from the release page.
 
 ---
 
