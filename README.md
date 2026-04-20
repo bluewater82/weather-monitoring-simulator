@@ -1,191 +1,224 @@
 # 🌦️ AtmosTrack
-### Linked List Weather Simulation Engine in C
-A systems-level weather simulation written in C that models environmental conditions across a network of sensors using a **circular doubly linked list**, probabilistic event modeling, and time-step delta analysis.
+
+A weather simulation project that evolved from a **terminal-based C program** into a **desktop Java Swing application** with a full graphical user interface.
+
+AtmosTrack began as a systems-focused simulation written in C to model weather sensors, regional conditions, alerts, and forecasts. It was later redesigned in Java with an object-oriented architecture and a Swing-based UI, preserving the core simulation logic while dramatically improving usability, presentation, and portability.
 
 ---
-### Preview
-![example of running program](assets/example_output.png)
+
+## Project Evolution
+
+### Version 1: C Linked-List Simulator
+The original AtmosTrack implementation was built in C as a command-line weather simulation engine.
+
+It emphasized:
+- Struct-based data modeling
+- Circular doubly linked lists with a sentinel node
+- Dynamic memory management
+- Probabilistic weather updates
+- Statistical summaries and forecasting
+- Menu-driven terminal interaction
+
+This version served as the systems/programming foundation of the project and focused heavily on low-level design, traversal logic, and state comparison over time.
+
+### Version 2: Java Swing Desktop Application
+The project was later rebuilt in Java as a full desktop application.
+
+This version preserved the underlying simulation ideas while introducing:
+- Object-oriented design using classes instead of structs
+- A complete Swing-based graphical user interface
+- Buttons, combo boxes, panels, and layout management
+- Background images and visual styling
+- Interactive weather displays for conditions, alerts, highs/lows, and forecasts
+- Packaging as an executable `.jar`
+
+This redesign shifted AtmosTrack from a console simulation into a user-facing application with a much stronger portfolio presence.
 
 ---
-## Project Overview
-AtmosTrack simulates a distributed network of weather sensors, each tracking:
+
+## Core Features Across Both Versions
+
+AtmosTrack simulates a network of weather sensors that track:
+
 - Temperature
 - Humidity
-- Atmospheric Pressure
-- Wind Speed
+- Atmospheric pressure
+- Wind speed
 
-The system evolves over time using a **probabilistic weather engine**, enabling:
-- Realistic environmental changes
-- Trend detection via delta tracking
-- Rule-based forecasting
+Both versions retain the essential core systems:
 
----
-## System Architecture
-### 🔗 Linked List Design
-AtmosTrack uses a circular doubly linked list with a sentinel node:
-```
-typedef struct Node {
-    Sensor data;
-    struct Node *next;
-    struct Node *prev;
-} Node;
-
-typedef struct {
-    Node *header;
-    int size;
-} SensorList;
-```
-**Why this matters**
-- Eliminates NULL edge cases
-- Simplifies traversal and insertion
-- Demonstrates real systems-level memory control
+- Sensor generation and initialization
+- Probabilistic weather engine
+- Regional statistics
+- High/low analysis
+- Heat index and wind chill alerting
+- Rule-based city forecasting
 
 ---
-## Simulation Pipeline
+
+## C Version Highlights
+
+### Data Structure Design
+The C implementation uses a circular doubly linked list with a sentinel node to store sensor records.
+
+This architecture was chosen to:
+- simplify traversal logic
+- eliminate many edge-case checks
+- demonstrate dynamic memory management in C
+
+### Simulation Pipeline
 Each update cycle:
-1. Copy current state -> previous
-2. Apply probabilistic weather event -> current
-3. Compute differences -> delta
-4. Use delta for forecasting and analytics
-```
-previous = copyList(&currentList);
-updateSensors(&currentList);
-calculateDeltas(&previous, &currentList, &delta);
-```
+1. copies the previous sensor state
+2. updates current weather conditions
+3. calculates deltas between states
+4. uses those trends in analysis and forecasting
 
-![simulation flow diagram](assets/simulation_flow.png)
-
----
-## Weather Engine (Core Logic)
-Weather evolves via weighted random events:
-| Event              | Effect             |
-| ------------------ | ------------------ |
-| Stable             | Minor fluctuations |
-| Warming/Drying     | Temp ↑ Humidity ↓  |
-| Cooling/Moistening | Temp ↓ Humidity ↑  |
-| Falling Pressure   | Storm signals      |
-| Rising Pressure    | Clear skies        |
-| Humid/Unstable     | Storm potential    |
-| Severe Event       | Large swings       |
-
-This creates natural-feeling transitions as opposed to pure randomness.
+### Systems Concepts Demonstrated
+- `malloc` / `free`
+- linked list traversal
+- deep copying vs mutation
+- insertion sort for rankings
+- modular procedural design
 
 ---
-## 📊 Data Analysis & Insights
-### Regional Statistics
-- Average temperature, humidity, pressure, and wind
-- Hottest and coldest cities
-- Trend metrics (warming, pressure shifts, change in wind)
 
-### Sorting Algorithms
-Insertion sort used to compute:
-- Hottest vs coldest cities
-- Wettest and driest cities
+## Java Version Highlights
+
+### Object-Oriented Redesign
+The Java version replaces structs and manual list management with classes and Java-side data structures, while preserving the same weather simulation ideas.
+
+### Swing User Interface
+The Java application includes:
+- a full GUI instead of terminal-only output
+- clickable controls
+- combo-box-driven interaction
+- visual panels for weather data
+- integrated backgrounds and styling assets
+
+### Distribution
+The Java build is packaged into an executable `.jar`, making it easier to run as a standalone desktop application.
 
 ---
-## Weather Alerts
-### 🔥Heat Index Advisory
-Detects dangerous heat + humidity combinations and issues warnings. Uses NOAA regression formula to compute the perceived elevated temperature.
-```
-feelsLike = -42.379 + 2.04901523*T + 10.14333127*RH ...
-```
-### ❄️Wind Chill Advisory
-Identifies frostbit-risk conditions and issues warnings. Uses the National Weather Service's formula for calculating the wind chill temperature.
-```
-feelsLike = 35.74 + 0.6215*T - 35.75*(v^0.16) + ...
+
+## Screenshots / Visuals
+
+Place project visuals in a `docs/` folder so they render directly in GitHub.
+
+Suggested files:
+- `docs/java-ui-main.png`
+- `docs/weather-alerts-panel.png`
+- `docs/highs-lows-panel.png`
+- `docs/c-linked-list-diagram.png`
+- `docs/simulation-flow.png`
+
+Example markdown:
+
+```md
+![AtmosTrack Java UI](docs/java-ui-main.png)
+![Weather Alerts Panel](docs/weather-alerts-panel.png)
 ```
 
 ---
-## Forecast Engine
-Forecasts combine:
-- Current conditions
-- Pressure trends
-- Humidity levels
-- Wind behavior
 
-Example:
-```
-if (pressure > 1020 && humidity < 40)
-    → Clear conditions
-else if (humidity > 85 && pressure falling)
-    → Thunderstorms likely
-```
+## Repository Structure
 
----
-## 🖥️User Interface
-```
-Main Menu
----------
-1. Current weather conditions
-2. Weather alerts
-3. Highs & Lows
-4. Update current conditions
-5. City forecasts
-6. Exit program
+A structure like this keeps both versions clear:
+
+```text
+AtmosTrack/
+├─ c-version/
+│  ├─ weatherSimLinkWIP.c
+│  ├─ cities.txt
+│  └─ README-notes.md
+├─ java-version/
+│  ├─ src/
+│  ├─ resources/
+│  ├─ out/
+│  └─ AtmosTrack.jar
+├─ docs/
+│  ├─ java-ui-main.png
+│  ├─ weather-alerts-panel.png
+│  ├─ highs-lows-panel.png
+│  ├─ c-linked-list-diagram.png
+│  └─ simulation-flow.png
+└─ README.md
 ```
 
----
-## Input Data
-Imports .txt files that contain city names to use in the data assignment for each sensor struct.
-```
-cities.txt
-```
-Example:
-```
-Albuquerque
-Denver
-Santa Fe
-Los Angeles
-Phoenix
-...
-```
+If both versions currently live together in a different layout, that is fine; this is just a clean long-term target.
 
 ---
-## Build & Run
-Git repo contains executable file but users can compile and run the source on their own machine using:
-```
+
+## Build Notes
+
+### C Version
+Compile with:
+
+```bash
 gcc weatherSimLinkWIP.c -o atmos -lm
 ./atmos
 ```
-*Note: root folder must contain a cities.txt file for program to compile correctly.
+
+### Java Version
+Build and package through IntelliJ or your preferred Java build process, ensuring image assets are included in the artifact as resources.
 
 ---
-## Key Technical Concepts
-### Data Structures
-- Circular doubly linked lists
-- Sentinel node (header) pattern
-### Memory Management
-- Dynamic allocation (malloc, free)
-- Deep copying vs mutation for different functions
-### Algorithms
-- Insertion sort
-- Traversal patterns
-### Simulation Design
-- Probabilistic modeling
-- Constraint clamping
-- State-delta comparison
+
+## Technical Skills Demonstrated
+
+### C / Systems Programming
+- linked lists
+- dynamic memory management
+- procedural decomposition
+- sorting and statistical analysis
+- simulation/state tracking
+
+### Java / Desktop Development
+- object-oriented redesign
+- Swing GUI construction
+- event-driven programming
+- resource management
+- artifact packaging and distribution
 
 ---
-## What Makes This Project Stand Out
-This is not just a CRUD-style program.
 
-It demonstrates:
-- System-level thinking in C
-- Dynamic data structures as opposed to just static arrays
-- Stateful simulation over time
-- Real-world modeling (weather dynamics)
-- Separation of concerns (data, logic, UI)
+## Why This Project Matters
 
----
-## Future Enhancements
-- Time-series history tracking
-- Multi-region climate simulation
-- Graph-based visualization such as plots
-- Persistent data logging
-- Advanced forecasting using ML integration
+AtmosTrack is valuable as a portfolio project because it shows more than one kind of programming skill.
+
+It demonstrates the ability to:
+- design a simulation engine from scratch
+- work at both low-level and high-level abstraction layers
+- refactor ideas across languages and paradigms
+- improve usability by evolving a systems project into a GUI application
+- think about software as both logic and user experience
 
 ---
-## 👤 Author
 
-### Andre DeHerrera
-Computer Science — University of New Mexico
+## Future Improvements
+
+Potential next steps include:
+- persistent save/load support
+- richer forecast logic
+- charts for time-series trends
+- configurable sensor counts and region sets
+- improved packaging and release workflow
+- migration to JavaFX or a web front end
+- optional machine-learning-assisted forecast experiments
+
+---
+
+## Author
+
+**Andre DeHerrera**  
+Computer Science Major  
+University of New Mexico
+
+---
+
+## Notes
+
+This README reflects the project as a two-version evolution:
+- the original **C linked-list simulator**
+- the newer **Java Swing desktop application**
+
+
