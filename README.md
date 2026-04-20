@@ -100,53 +100,13 @@ The Java build is packaged into an executable `.jar`, making it easier to run as
 
 ---
 
-## Screenshots / Visuals
+## Screenshots
 
-Place project visuals in a `docs/` folder so they render directly in GitHub.
-
-Suggested files:
-- `docs/java-ui-main.png`
-- `docs/weather-alerts-panel.png`
-- `docs/highs-lows-panel.png`
-- `docs/c-linked-list-diagram.png`
-- `docs/simulation-flow.png`
-
-Example markdown:
-
-```md
-![AtmosTrack Java UI](docs/java-ui-main.png)
-![Weather Alerts Panel](docs/weather-alerts-panel.png)
-```
+![Legacy C Screenshot](assets/example_output.png)
+![Java UI Screenshot](assets/screenshotAtmos.png)
 
 ---
 
-## Repository Structure
-
-A structure like this keeps both versions clear:
-
-```text
-AtmosTrack/
-├─ c-version/
-│  ├─ weatherSimLinkWIP.c
-│  ├─ cities.txt
-│  └─ README-notes.md
-├─ java-version/
-│  ├─ src/
-│  ├─ resources/
-│  ├─ out/
-│  └─ AtmosTrack.jar
-├─ docs/
-│  ├─ java-ui-main.png
-│  ├─ weather-alerts-panel.png
-│  ├─ highs-lows-panel.png
-│  ├─ c-linked-list-diagram.png
-│  └─ simulation-flow.png
-└─ README.md
-```
-
-If both versions currently live together in a different layout, that is fine; this is just a clean long-term target.
-
----
 
 ## Build Notes
 
