@@ -1,100 +1,101 @@
 Albuquerque
 Santa Fe
-Roswell
-Taos
-Farmington
 Las Cruces
-Gallup
-Socorro
+Roswell
+Farmington
+Clovis
+Hobbs
 Carlsbad
+Gallup
+Deming
 Silver City
+Los Alamos
+Artesia
+Portales
+Ruidoso
+Taos
+Grants
+Bloomfield
+Aztec
+Belen
+Socorro
+Lovington
+Espanola
+Sunland Park
 Phoenix
 Tucson
 Mesa
+Chandler
 Scottsdale
-Flagstaff
-Sedona
-Tempe
 Glendale
+Tempe
+Peoria
 Yuma
+Flagstaff
 Prescott
-Denver
-Boulder
-Fort Collins
-Colorado Springs
-Aspen
-Vail
-Durango
-Grand Junction
-Telluride
-Greeley
-Dallas
-Austin
-Houston
-San Antonio
+Prescott Valley
+Casa Grande
+Maricopa
+Sierra Vista
+Kingman
+Bullhead City
+Lake Havasu City
+Nogales
+Douglas
+Sedona
+Show Low
+Payson
+Winslow
+Page
 El Paso
+Midland
+Odessa
+San Angelo
 Lubbock
 Amarillo
-Waco
-Plano
-Irving
-Los Angeles
-San Diego
-San Jose
-San Francisco
-Sacramento
-Fresno
-Bakersfield
-Santa Barbara
-Monterey
+Abilene
+Del Rio
+Eagle Pass
+Pecos
+Fort Stockton
+Alpine
+Big Spring
+Brownfield
+Levelland
+Hereford
+Plainview
+Snyder
+Sweetwater
+Monahans
+Durango
+Cortez
+Pagosa Springs
+Montrose
+Delta
+Alamosa
+Trinidad
+La Junta
+Canon City
+Pueblo
+St. George
+Cedar City
+Moab
+Price
+Richfield
+Las Vegas
+Henderson
+North Las Vegas
+Mesquite
+Boulder City
+Pahrump
+Elko
 Palm Springs
-Seattle
-Spokane
-Tacoma
-Olympia
-Everett
-Bellingham
-Yakima
-Kennewick
-Wenatchee
-Pullman
-Chicago
-Springfield
-Peoria
-Naperville
-Rockford
-Aurora
-Joliet
-Evanston
-Decatur
-Champaign
-Miami
-Orlando
-Tampa
-Jacksonville
-Tallahassee
-Pensacola
-Naples
-Fort Lauderdale
-Key West
-Sarasota
-New York
-Buffalo
-Rochester
-Albany
-Syracuse
-Ithaca
-Yonkers
-Utica
-White Plains
-Niagara Falls
-Boston
-Cambridge
-Salem
-Worcester
-Springfield
-Lowell
-Plymouth
-Quincy
-Newton
-Brookline
+Indio
+Coachella
+El Centro
+Blythe
+Barstow
+Needles
+Twentynine Palms
+Victorville
+Lancaster
