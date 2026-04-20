@@ -34,8 +34,11 @@ public class FrameBackgroundPanel extends JPanel {
     private void loadImage() {
         try {
             if (imagePath != null && !imagePath.isEmpty()) {
-                // Try to load as resource first (works for JAR), then as file (works for development)
-                java.net.URL imageUrl = getClass().getResource(imagePath);
+                // Convert path to absolute resource path (must start with /)
+                String resourcePath = imagePath.startsWith("/") ? imagePath : "/" + imagePath;
+                
+                // Try to load as classpath resource (works in JAR)
+                java.net.URL imageUrl = getClass().getResource(resourcePath);
                 if (imageUrl != null) {
                     backgroundImage = ImageIO.read(imageUrl);
                     System.out.println("Frame background image loaded successfully from JAR.");
